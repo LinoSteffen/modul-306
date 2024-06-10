@@ -8,13 +8,18 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.dashboard.address=:8089"
+      - "--api.dashboard=true"
     ports:
       - "80:80"
-      - "8080:8080"
+      - "8089:8089"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.somedomain.ch`)"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=8089"
     networks:
-      - default
+      - traefik-net
 
   db:
     image: mariadb:10.6.4-focal
@@ -30,7 +35,7 @@ services:
     expose:
       - 3306
     networks:
-      - default
+      - traefik-net
 
   wordpress:
     image: wordpress:latest
@@ -46,7 +51,7 @@ services:
       - "traefik.http.routers.wordpress.rule=Host(`wordpress.somedomain.ch`)"
       - "traefik.http.services.wordpress.loadbalancer.server.port=80"
     networks:
-      - default
+      - traefik-net
 
   bind:
     image: eafxx/bind
@@ -68,13 +73,12 @@ services:
       - "traefik.http.routers.webmin.rule=Host(`webmin.somedomain.ch`)"
       - "traefik.http.services.webmin.loadbalancer.server.port=10000"
     networks:
-      - default
+      - traefik-net
 
 volumes:
   db_data:
   bind:
 
 networks:
-  default:
-    external:
-      name: bridge
+  traefik-net:
+    driver: bridge
