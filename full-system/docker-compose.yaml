@@ -1,0 +1,80 @@
+version: '3.7'
+
+services:
+  traefik:
+    image: traefik:v2.5
+    container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - default
+
+  db:
+    image: mariadb:10.6.4-focal
+    command: '--default-authentication-plugin=mysql_native_password'
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=wordpress_root
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wordpress
+      - MYSQL_PASSWORD=wordpress
+    expose:
+      - 3306
+    networks:
+      - default
+
+  wordpress:
+    image: wordpress:latest
+    restart: always
+    depends_on:
+      - db
+    environment:
+      - WORDPRESS_DB_HOST=db:3306
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_DB_NAME=wordpress
+    labels:
+      - "traefik.http.routers.wordpress.rule=Host(`wordpress.somedomain.ch`)"
+      - "traefik.http.services.wordpress.loadbalancer.server.port=80"
+    networks:
+      - default
+
+  bind:
+    image: eafxx/bind
+    restart: unless-stopped
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+      - 10000:10000 # There for initial configuration, after dns records are set, you can use the traefik endpoint.
+    volumes:
+      - 'bind:/data'
+    environment:
+      - WEBMIN_ENABLED=true
+      - WEBMIN_INIT_SSL_ENABLED=false
+      - WEBMIN_INIT_REFERERS=*
+      - WEBMIN_INIT_REDIRECT_PORT=10000
+      - ROOT_PASSWORD=sml12345
+      - TZ=Europe/Zurich
+    labels:
+      - "traefik.http.routers.webmin.rule=Host(`webmin.somedomain.ch`)"
+      - "traefik.http.services.webmin.loadbalancer.server.port=10000"
+    networks:
+      - default
+
+volumes:
+  db_data:
+  bind:
+
+networks:
+  default:
+    external:
+      name: bridge

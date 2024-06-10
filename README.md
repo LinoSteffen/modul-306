@@ -3,11 +3,11 @@
 ## Install docker
 Remove any Docker files that are running in the system
 
-`sudo apt-get remove docker docker-engine docker.io`
+`sudo apt remove docker docker-engine docker.io`
 
 Check if the system is up-to-date
 
-`sudo apt-get update`
+`sudo apt update`
 
 Install Docker
 
@@ -39,7 +39,7 @@ reboot
 ## Install docker compose
 Install docker compose
 
-`sudo apt-get install docker-compose-plugin`
+`sudo apt install docker-compose-plugin`
 
 check version 
 
