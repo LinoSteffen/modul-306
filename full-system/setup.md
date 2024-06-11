@@ -11,9 +11,10 @@ nameserver <serverhostip>
 ```
 
 This will set up the following:
-- Traefik dashboard on `http://traefik.somedomain.ch:8080`
-- WordPress instance on `http://wordpress.somedomain.ch:80`
-- Webmin on `http://webmin.somedomain.ch:10000`
+- Traefik dashboard on `http://traefik.somedomain.ch`
+- WordPress instance on `http://wordpress.somedomain.ch`
+- Portainer on `http://portainer.somedomain.ch`
+- Webmin on `http://webmin.somedomain.ch`
 
 Additionally, you can access Webmin directly via port 10000 on the host system.
 
@@ -46,6 +47,10 @@ Additionally, you can access Webmin directly via port 10000 on the host system.
      - Name: `wordpress`
      - Address: `<serverhostip>`
      - Click `Create`.
+   - Add an `A` record for `portainer`:
+     - Name: `portainer`
+     - Address: `<serverhostip>`
+     - Click `Create`.
    - Add an `A` record for `webmin`:
      - Name: `webmin`
      - Address: `<serverhostip>`
@@ -54,4 +59,4 @@ Additionally, you can access Webmin directly via port 10000 on the host system.
 5. Apply Configuration:
    - Click `Apply Configuration` to reload the DNS server with your new settings.
 
-Now your DNS server should correctly resolve the domains `traefik.somedomain.ch`, `wordpress.somedomain.ch`, and `webmin.somedomain.ch` to your server's IP address.
+Now your DNS server should correctly resolve the domains `traefik.somedomain.ch`, `wordpress.somedomain.ch`, `portainer.somedomain.ch` and `webmin.somedomain.ch` to your server's IP address.

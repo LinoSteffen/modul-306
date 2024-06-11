@@ -53,6 +53,20 @@ services:
     networks:
       - traefik-net
 
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: always
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - portainer_data:/data
+    labels:
+      - "traefik.http.routers.portainer.rule=Host(`portainer.somedomain.ch`)"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+    networks:
+      - traefik-net
+
   bind:
     image: eafxx/bind
     restart: unless-stopped
@@ -78,6 +92,7 @@ services:
 volumes:
   db_data:
   bind:
+  portainer_data:
 
 networks:
   traefik-net:
